@@ -34,4 +34,19 @@ export async function getTeams() {
   }
 }
 
-export default { getTeams };
+//export default { getTeams };
+
+export async function getPlayerProfile(playerId) {
+  const url = `${BASE}/mlb/trial/v8/en/players/${playerId}/profile.json`;
+
+  try {
+    const res = await axios.get(url, {
+      params: { api_key: API_KEY },
+      headers: { accept: "application/json" },
+    });
+    return res.data;
+  } catch (err) {
+    console.error("getPlayerProfile error:", err);
+    throw err;
+  }
+}

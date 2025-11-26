@@ -40,15 +40,6 @@ export default function Home() {
     };
   }, []);
 
-  // Enforce mutual exclusivity: if player selected, disable team; if team selected, disable player
-  useEffect(() => {
-    if (playerId) setTeamId(null);
-  }, [playerId]);
-
-  useEffect(() => {
-    if (teamId) setPlayerId(null);
-  }, [teamId]);
-
   const isPlayerMode = !!playerId;
   const isTeamMode = !!teamId;
 
@@ -65,8 +56,8 @@ export default function Home() {
         playerId={playerId}
         teamId={teamId}
         onSeasonChange={setSeason}
-        onPlayerChange={(id) => setPlayerId(id || null)}
-        onTeamChange={(id) => setTeamId(id || null)}
+        onPlayerChange={(id) => { setPlayerId(id || null); setTeamId(null); }}
+        onTeamChange={(id) => { setTeamId(id || null); setPlayerId(null); }}
       />
 
       <div className="views">

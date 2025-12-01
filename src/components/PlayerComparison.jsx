@@ -5,6 +5,17 @@ import {
   getPlayerProfile,
 } from "../api/sportsradarClient";
 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
 export default function PlayerComparison() {
   const [teams, setTeams] = useState([]);
 
@@ -83,33 +94,20 @@ export default function PlayerComparison() {
   // Extract stats
   const getPlayerStats = (data) => {
     const player = data?.player;
-    const season = player?.seasons?.[0]?.totals?.statistics;
-
-    if (!season) return { avg: "—", hr: "—", era: "—", k9: "—" };
-
-    const hitting = season.hitting?.overall;
-    const pitching = season.pitching?.overall;
-
-    if (hitting) {
-      return {
-        avg: hitting.avg ?? "—",
-        hr: hitting.onbase?.hr ?? "—",
-        era: "—",
-        k9: "—",
-      };
-    }
-
-    if (pitching) {
-      return {
-        avg: "—",
-        hr: "—",
-        era: pitching.era ?? "—",
-        k9: pitching.k9 ?? "—",
-      };
-    }
-
-    return { avg: "—", hr: "—", era: "—", k9: "—" };
+    const seasonTotals = player?.seasons?.[0]?.totals?.statistics || {};
+  
+    const hitting = seasonTotals.hitting?.overall || {};
+    const pitching = seasonTotals.pitching?.overall || {};
+  
+    return {
+      avg: hitting.avg ?? "—",
+      hr: hitting.onbase?.hr ?? "—",
+      era: pitching.era ?? "—",
+      k9: pitching.k9 ?? "—",
+    };
   };
+  
+  
 
   // Fetch player profile when selected
   const handleSelect = async (playerId, setter, loaderSetter) => {
@@ -125,6 +123,19 @@ export default function PlayerComparison() {
     } finally {
       loaderSetter(false);
     }
+  };
+  const buildComparisonData = () => {
+    if (!player1 && !player2) return [];
+  
+    const s1 = player1 ? getPlayerStats(player1) : {};
+    const s2 = player2 ? getPlayerStats(player2) : {};
+  
+    return [
+      { stat: "AVG", p1: Number(s1.avg) || 0, p2: Number(s2.avg) || 0 },
+      { stat: "HR",  p1: Number(s1.hr)  || 0, p2: Number(s2.hr)  || 0 },
+      { stat: "ERA", p1: Number(s1.era) || 0, p2: Number(s2.era) || 0 },
+      { stat: "K/9", p1: Number(s1.k9)  || 0, p2: Number(s2.k9)  || 0 },
+    ];
   };
 
   return (
@@ -181,7 +192,7 @@ export default function PlayerComparison() {
           )}
         </div>
 
-        {/* TEAM 2 + PLAYER 2 (side-by-side spacing) */}
+
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <div style={{ flex: 1 }}>
@@ -296,8 +307,8 @@ export default function PlayerComparison() {
               <p><strong>Name:</strong> {player.player.full_name}</p>
               <p><strong>AVG:</strong> {stats.avg}</p>
               <p><strong>HR:</strong> {stats.hr}</p>
-              {stats.era !== "—" && <p><strong>ERA:</strong> {stats.era}</p>}
-              {stats.k9 !== "—" && <p><strong>K/9:</strong> {stats.k9}</p>}
+              <p><strong>ERA:</strong> {stats.era}</p>
+              <p><strong>K/9:</strong> {stats.k9}</p>
             </>
           ) : (
             <p>No player selected.</p>
@@ -309,21 +320,35 @@ export default function PlayerComparison() {
 </div>
 
 
-      {/* GRAPH PLACEHOLDER */}
-      <div
-        style={{
-          height: "300px",
-          background: "#f9f9f9",
-          border: "1px solid #ccc",
-          borderRadius: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: "bold",
-        }}
-      >
-        Performance Comparison Over Time (Graph Coming Soon)
-      </div>
+   {/* GRAPH */}
+<div
+  style={{
+    height: "350px",
+    background: "white",
+    borderRadius: "10px",
+    padding: "20px",
+    border: "1px solid #ccc",
+    marginTop: "40px"
+  }}
+>
+  <h3 style={{ marginBottom: "10px" }}>
+    Player Statistical Comparison
+  </h3>
+
+  <ResponsiveContainer width="100%" height="100%">
+    <BarChart data={buildComparisonData()}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="stat" />
+      <YAxis />
+      <Tooltip />
+      <Legend />
+
+      <Bar dataKey="p1" name="Player 1" fill="#8884d8" />
+      <Bar dataKey="p2" name="Player 2" fill="#82ca9d" />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+
     </div>
   );
 }

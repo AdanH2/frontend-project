@@ -1,51 +1,105 @@
 import { useEffect, useState } from "react";
-import { getTeams } from "../api/sportsradarClient";
+import {
+  getSeasonLeaders,
+  getPlayerProfile,
+  getTeamProfile,
+  getPlayersByTeam,
+  getTeams,
+} from "../api/sportsradarClient";
+import Filters from "./Filters";
+import HRLeaders from "./views/HRLeaders";
+import AVGLeaders from "./views/AVGLeaders";
+import ERALeaders from "./views/ERALeaders";
+import PlayerBio from "./views/PlayerBio";
+import PlayerPerformance from "./views/PlayerPerformance";
+import PlayerStats from "./views/PlayerStats";
+import TeamBio from "./views/TeamBio";
+import TeamPlayers from "./views/TeamPlayers";
+import TeamPerformance from "./views/TeamPerformance";
 
 export default function Home() {
-  const [teams, setTeams] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [season, setSeason] = useState("2025");
+  const [playerId, setPlayerId] = useState(null);
+  const [teamId, setTeamId] = useState(null);
+
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
     getTeams()
       .then((data) => {
         if (!mounted) return;
-        // The Sportradar response typically includes a `teams` array
         setTeams(data?.teams ?? []);
       })
       .catch((err) => {
-        if (!mounted) return;
         console.error(err);
-        setError(err);
-      })
-      .finally(() => {
-        if (!mounted) return;
-        setLoading(false);
+        setTeams([]);
       });
     return () => {
       mounted = false;
     };
   }, []);
 
+  const isPlayerMode = !!playerId;
+  const isTeamMode = !!teamId;
+
   return (
     <div className="page home-page">
-      <h2>Home</h2>
-      {loading && <p>Loading teams...</p>}
-      {error && <p>Error loading teams.</p>}
-      {!loading && !error && (
-        <div>
-          {teams.length === 0 && <p>No team data available.</p>}
-          <ul>
-            {teams.map((t) => (
-              <li key={t?.id}>
-                {t?.market ? `${t.market} ${t.name}` : t?.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <h2>Welcome to the MLB Stats Dashboard</h2>
+      <p>
+        Explore leaders, players, and team performance for the selected season.
+      </p>
+
+      <Filters
+        teams={teams}
+        season={season}
+        playerId={playerId}
+        teamId={teamId}
+        onSeasonChange={setSeason}
+        onPlayerChange={(id) => { setPlayerId(id || null); setTeamId(null); }}
+        onTeamChange={(id) => { setTeamId(id || null); setPlayerId(null); }}
+      />
+
+      <div className="views">
+        {!isPlayerMode && !isTeamMode && (
+          <>
+            <HRLeaders season={season} getSeasonLeaders={getSeasonLeaders} />
+            <AVGLeaders season={season} getSeasonLeaders={getSeasonLeaders} />
+            <ERALeaders season={season} getSeasonLeaders={getSeasonLeaders} />
+          </>
+        )}
+
+        {isPlayerMode && (
+          <>
+            <PlayerBio
+              playerId={playerId}
+              getPlayerProfile={getPlayerProfile}
+              season={season}
+            />
+            <PlayerPerformance
+              playerId={playerId}
+              getPlayerProfile={getPlayerProfile}
+            />
+            <PlayerStats
+              playerId={playerId}
+              getPlayerProfile={getPlayerProfile}
+              season={season}
+            />
+          </>
+        )}
+
+        {isTeamMode && (
+          <>
+            <TeamBio teamId={teamId} getTeamProfile={getTeamProfile} />
+            <TeamPlayers teamId={teamId} getPlayersByTeam={getPlayersByTeam} />
+            <TeamPerformance
+              teamId={teamId}
+              getTeamProfile={getTeamProfile}
+              season={season}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }

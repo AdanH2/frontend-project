@@ -50,3 +50,18 @@ export async function getPlayerProfile(playerId) {
     throw err;
   }
 }
+
+export async function getTeamProfile(teamId) {
+  const url = `${BASE}/mlb/trial/v8/en/teams/${teamId}/profile.json`;
+
+  try {
+    const res = await axios.get(url, {
+      params: { api_key: API_KEY },
+      headers: { accept: "application/json" }
+    });
+    return res.data;
+  } catch (error) {
+    console.error("getTeamProfile error:", error);
+    throw error;
+  }
+}

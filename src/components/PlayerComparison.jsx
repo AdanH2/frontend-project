@@ -1,43 +1,104 @@
-import React, { useState } from "react";
-import { getPlayerProfile } from "../api/sportsradarClient";
-
-// Hardcoded players with real Sportradar IDs
-const PLAYERS = [
-  {
-    id: "80de60c9-74e3-4a50-b128-b3dc7456a254", // Shohei Ohtani
-    name: "Shohei Ohtani",
-  },
-  {
-    id: "insert-real-id-for-aaron-judge",
-    name: "Aaron Judge",
-  },
-  {
-    id: "insert-real-id-for-mookie-betts",
-    name: "Mookie Betts",
-  },
-];
+import React, { useEffect, useState } from "react";
+import {
+  getTeams,
+  getTeamProfile,
+  getPlayerProfile,
+} from "../api/sportsradarClient";
 
 export default function PlayerComparison() {
+  const [teams, setTeams] = useState([]);
+
+  const [team1, setTeam1] = useState("");
+  const [team2, setTeam2] = useState("");
+
+  const [roster1, setRoster1] = useState([]);
+  const [roster2, setRoster2] = useState([]);
+
   const [player1, setPlayer1] = useState(null);
   const [player2, setPlayer2] = useState(null);
+
   const [loading1, setLoading1] = useState(false);
   const [loading2, setLoading2] = useState(false);
 
-  // Helper to extract stats
+  const [rosterError1, setRosterError1] = useState(false);
+  const [rosterError2, setRosterError2] = useState(false);
+
+  // Load MLB teams at startup
+  useEffect(() => {
+    async function loadTeams() {
+      try {
+        const data = await getTeams();
+        setTeams(data.teams || []);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadTeams();
+  }, []);
+
+  // Fetch roster for Team 1
+  useEffect(() => {
+    if (!team1) return setRoster1([]);
+
+    async function loadRoster() {
+      try {
+        const data = await getTeamProfile(team1);
+        const players = data.players || [];
+
+        if (players.length === 0) setRosterError1(true);
+        else setRosterError1(false);
+
+        setRoster1(players);
+      } catch (err) {
+        console.error(err);
+        setRoster1([]);
+        setRosterError1(true);
+      }
+    }
+    loadRoster();
+  }, [team1]);
+
+  // Fetch roster for Team 2
+  useEffect(() => {
+    if (!team2) return setRoster2([]);
+
+    async function loadRoster() {
+      try {
+        const data = await getTeamProfile(team2);
+        const players = data.players || [];
+
+        if (players.length === 0) setRosterError2(true);
+        else setRosterError2(false);
+
+        setRoster2(players);
+      } catch (err) {
+        console.error(err);
+        setRoster2([]);
+        setRosterError2(true);
+      }
+    }
+    loadRoster();
+  }, [team2]);
+
+  // Extract stats
   const getPlayerStats = (data) => {
     const player = data?.player;
     const season = player?.seasons?.[0]?.totals?.statistics;
+
     if (!season) return { avg: "—", hr: "—", era: "—", k9: "—" };
 
     const hitting = season.hitting?.overall;
+    const pitching = season.pitching?.overall;
+
     if (hitting) {
       return {
         avg: hitting.avg ?? "—",
         hr: hitting.onbase?.hr ?? "—",
+        era: "—",
+        k9: "—",
       };
     }
 
-    const pitching = season.pitching?.overall;
     if (pitching) {
       return {
         avg: "—",
@@ -47,21 +108,22 @@ export default function PlayerComparison() {
       };
     }
 
-    return { avg: "—", hr: "—" };
+    return { avg: "—", hr: "—", era: "—", k9: "—" };
   };
 
-  // Fetch player data by ID
-  const handleSelect = async (id, setPlayer, setLoading) => {
-    if (!id) return setPlayer(null);
-    setLoading(true);
+  // Fetch player profile when selected
+  const handleSelect = async (playerId, setter, loaderSetter) => {
+    if (!playerId) return setter(null);
+
+    loaderSetter(true);
     try {
-      const profile = await getPlayerProfile(id);
-      setPlayer(profile);
+      const profile = await getPlayerProfile(playerId);
+      setter(profile);
     } catch (err) {
       console.error(err);
-      setPlayer(null);
+      setter(null);
     } finally {
-      setLoading(false);
+      loaderSetter(false);
     }
   };
 
@@ -71,106 +133,196 @@ export default function PlayerComparison() {
 
       {/* SELECTORS */}
       <div style={{ display: "flex", gap: "30px", marginBottom: "20px" }}>
-        {/* Player 1 Selector */}
-        <div style={{ flex: 1 }}>
-          <label style={{ fontWeight: "bold" }}>Select Player 1:</label>
-          <select
-            className="form-select mt-2"
-            onChange={(e) =>
-              handleSelect(e.target.value, setPlayer1, setLoading1)
-            }
-          >
-            <option value="">-- choose player --</option>
-            {PLAYERS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </div>
 
-        {/* Player 2 Selector */}
+        {/* TEAM 1 + PLAYER 1 (side-by-side spacing) */}
         <div style={{ flex: 1 }}>
-          <label style={{ fontWeight: "bold" }}>Select Player 2:</label>
-          <select
-            className="form-select mt-2"
-            onChange={(e) =>
-              handleSelect(e.target.value, setPlayer2, setLoading2)
-            }
-          >
-            <option value="">-- choose player --</option>
-            {PLAYERS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* PLAYER CARDS */}
-      <div style={{ display: "flex", gap: "30px", marginBottom: "50px" }}>
-        {[{ player: player1, loading: loading1, title: "Player 1" },
-          { player: player2, loading: loading2, title: "Player 2" }].map(
-          ({ player, loading, title }, i) => {
-            const stats = getPlayerStats(player);
-            return (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  background: "white",
-                  border: "1px solid #ccc",
-                  borderRadius: "10px",
-                  padding: "20px",
-                  position: "relative",
-                  textAlign: "left",
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <div style={{ flex: 1 }}>
+              <label>Team 1: </label>
+              <select
+                className="form-select mt-2"
+                value={team1}
+                onChange={(e) => {
+                  setTeam1(e.target.value);
+                  setPlayer1(null);
                 }}
               >
-                <h2 style={{ fontWeight: "bold", marginBottom: "15px" }}>{title}</h2>
-                {loading ? (
-                  <p>Loading...</p>
-                ) : (
-                  <>
-                    <p>Name: {player?.player?.full_name || "—"}</p>
-                    <p>AVG: {stats.avg}</p>
-                    <p>HR: {stats.hr}</p>
-                    {stats.era && <p>ERA: {stats.era}</p>}
-                    {stats.k9 && <p>K/9: {stats.k9}</p>}
-                  </>
-                )}
-                {/* Image placeholder */}
-                <div
-                  style={{
-                    width: "90px",
-                    height: "90px",
-                    background: "#e0e0e0",
-                    borderRadius: "6px",
-                    position: "absolute",
-                    top: "20px",
-                    right: "20px",
-                  }}
-                />
-              </div>
-            );
-          }
-        )}
+                <option value="">-- Select Team --</option>
+                {teams.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <label>Player 1: </label>
+              <select
+                className="form-select mt-2"
+                onChange={(e) =>
+                  handleSelect(e.target.value, setPlayer1, setLoading1)
+                }
+              >
+                <option value="">-- Select Player --</option>
+                {roster1.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {rosterError1 && (
+            <p style={{ color: "red", fontSize: "14px" }}>
+              Roster unavailable for this team (API limitation).
+            </p>
+          )}
+        </div>
+
+        {/* TEAM 2 + PLAYER 2 (side-by-side spacing) */}
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <div style={{ flex: 1 }}>
+              <label>Team 2: </label>
+              <select
+                className="form-select mt-2"
+                value={team2}
+                onChange={(e) => {
+                  setTeam2(e.target.value);
+                  setPlayer2(null);
+                }}
+              >
+                <option value="">-- Select Team --</option>
+                {teams.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <label>Player 2: </label>
+              <select
+                className="form-select mt-2"
+                onChange={(e) =>
+                  handleSelect(e.target.value, setPlayer2, setLoading2)
+                }
+              >
+                <option value="">-- Select Player --</option>
+                {roster2.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {rosterError2 && (
+            <p style={{ color: "red", fontSize: "14px" }}>
+              Roster unavailable for this team (API limitation).
+            </p>
+          )}
+        </div>
       </div>
+
+{/* PLAYER CARDS */}
+<div style={{ display: "flex", gap: "30px", marginBottom: "40px" }}>
+  {[{ player: player1, loading: loading1, title: "Player 1" },
+    { player: player2, loading: loading2, title: "Player 2" }].map(
+    ({ player, loading, title }, i) => {
+      const stats = getPlayerStats(player);
+
+      // Extract best available player photo
+      const photo =
+        player?.player?.official_image ||
+        player?.player?.photo ||
+        player?.player?.images?.headshot?.href ||
+        null;
+
+      return (
+        <div
+          key={i}
+          style={{
+            flex: 1,
+            border: "1px solid #ccc",
+            padding: "20px",
+            borderRadius: "10px",
+            position: "relative",
+            minHeight: "200px",
+          }}
+        >
+          <h2>{title}</h2>
+
+          {loading ? (
+            <p>Loading…</p>
+          ) : player ? (
+            <>
+              {/* PLAYER IMAGE */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  width: "90px",
+                  height: "90px",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  background: "#e0e0e0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt="player headshot"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <span style={{ fontSize: "12px", color: "#666" }}>No Image</span>
+                )}
+              </div>
+
+              {/* TEXT */}
+              <p><strong>Name:</strong> {player.player.full_name}</p>
+              <p><strong>AVG:</strong> {stats.avg}</p>
+              <p><strong>HR:</strong> {stats.hr}</p>
+              {stats.era !== "—" && <p><strong>ERA:</strong> {stats.era}</p>}
+              {stats.k9 !== "—" && <p><strong>K/9:</strong> {stats.k9}</p>}
+            </>
+          ) : (
+            <p>No player selected.</p>
+          )}
+        </div>
+      );
+    }
+  )}
+</div>
+
 
       {/* GRAPH PLACEHOLDER */}
       <div
         style={{
           height: "300px",
-          background: "#fafafa",
+          background: "#f9f9f9",
           border: "1px solid #ccc",
           borderRadius: "10px",
           display: "flex",
-          justifyContent: "center",
           alignItems: "center",
+          justifyContent: "center",
           fontWeight: "bold",
         }}
       >
-        Performance Comparison Over Time (Graph Placeholder)
+        Performance Comparison Over Time (Graph Coming Soon)
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function PlayerBio({ playerId, getPlayerById, season }) {
+export default function PlayerBio({ playerId, getPlayerProfile, season }) {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ export default function PlayerBio({ playerId, getPlayerById, season }) {
       return;
     }
     setLoading(true);
-    getPlayerById(playerId)
+    getPlayerProfile(playerId)
       .then((data) => {
         if (!mounted) return;
         setPlayer(data?.player ?? data ?? null);
@@ -28,7 +28,7 @@ export default function PlayerBio({ playerId, getPlayerById, season }) {
         setLoading(false);
       });
     return () => (mounted = false);
-  }, [playerId, getPlayerById]);
+  }, [playerId, getPlayerProfile]);
 
   return (
     <section className="view player-bio">

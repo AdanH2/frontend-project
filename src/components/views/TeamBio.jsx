@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function TeamBio({ teamId, getTeamById }) {
+export default function TeamBio({ teamId, getTeamProfile }) {
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ export default function TeamBio({ teamId, getTeamById }) {
       return;
     }
     setLoading(true);
-    getTeamById(teamId)
+    getTeamProfile(teamId)
       .then((data) => {
         if (!mounted) return;
         setTeam(data?.team ?? data ?? null);
@@ -28,7 +28,7 @@ export default function TeamBio({ teamId, getTeamById }) {
         setLoading(false);
       });
     return () => (mounted = false);
-  }, [teamId, getTeamById]);
+  }, [teamId, getTeamProfile]);
 
   return (
     <section className="view team-bio">

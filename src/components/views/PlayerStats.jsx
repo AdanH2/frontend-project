@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function PlayerStats({ playerId, getPlayerById, season }) {
+export default function PlayerStats({ playerId, getPlayerProfile, season }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ export default function PlayerStats({ playerId, getPlayerById, season }) {
       return;
     }
     setLoading(true);
-    getPlayerById(playerId)
+    getPlayerProfile(playerId)
       .then((data) => {
         if (!mounted) return;
         // Adjust to extract stats from the player data structure
@@ -29,7 +29,7 @@ export default function PlayerStats({ playerId, getPlayerById, season }) {
         setLoading(false);
       });
     return () => (mounted = false);
-  }, [playerId, getPlayerById, season]);
+  }, [playerId, getPlayerProfile, season]);
 
   return (
     <section className="view player-stats">

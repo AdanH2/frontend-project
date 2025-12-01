@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   getSeasonLeaders,
-  getPlayerById,
-  getTeamById,
+  getPlayerProfile,
+  getTeamProfile,
   getPlayersByTeam,
   getTeams,
 } from "../api/sportsradarClient";
@@ -73,16 +73,16 @@ export default function Home() {
           <>
             <PlayerBio
               playerId={playerId}
-              getPlayerById={getPlayerById}
+              getPlayerProfile={getPlayerProfile}
               season={season}
             />
             <PlayerPerformance
               playerId={playerId}
-              getPlayerById={getPlayerById}
+              getPlayerProfile={getPlayerProfile}
             />
             <PlayerStats
               playerId={playerId}
-              getPlayerById={getPlayerById}
+              getPlayerProfile={getPlayerProfile}
               season={season}
             />
           </>
@@ -90,11 +90,11 @@ export default function Home() {
 
         {isTeamMode && (
           <>
-            <TeamBio teamId={teamId} getTeamById={getTeamById} />
+            <TeamBio teamId={teamId} getTeamProfile={getTeamProfile} />
             <TeamPlayers teamId={teamId} getPlayersByTeam={getPlayersByTeam} />
             <TeamPerformance
               teamId={teamId}
-              getTeamById={getTeamById}
+              getTeamProfile={getTeamProfile}
               season={season}
             />
           </>

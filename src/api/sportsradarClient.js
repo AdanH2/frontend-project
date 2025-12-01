@@ -1,4 +1,8 @@
 import axios from "axios";
+// getTeamProfile
+// getTeamById
+// getPlayerById
+// getPlayerProfile
 
 // Use Vite env var for the API key. Create a `.env` or `.env.local` with
 // `VITE_SPORTSRADAR_API_KEY=your_key` and do NOT commit that file.
@@ -127,7 +131,7 @@ export async function getSeasonLeaders(stat = "home_runs", season = "2025") {
   }
 }
 
-export async function getPlayerById(playerId) {
+export async function getPlayerProfile(playerId) {
   try {
     if (!playerId) return null;
     const url = `${BASE}/mlb/trial/v8/en/players/${playerId}/profile.json`;
@@ -137,12 +141,12 @@ export async function getPlayerById(playerId) {
     });
     return res.data;
   } catch (error) {
-    console.error("sportsradarClient.getPlayerById error:", error);
+    console.error("sportsradarClient.getPlayerProfile error:", error);
     throw error;
   }
 }
 
-export async function getTeamById(teamId) {
+export async function getTeamProfile(teamId) {
   try {
     if (!teamId) return null;
     const url = `${BASE}/mlb/trial/v8/en/teams/${teamId}/profile.json`;
@@ -152,7 +156,7 @@ export async function getTeamById(teamId) {
     });
     return res.data;
   } catch (error) {
-    console.error("sportsradarClient.getTeamById error:", error);
+    console.error("sportsradarClient.getTeamProfile error:", error);
     throw error;
   }
 }
@@ -175,7 +179,7 @@ export async function getPlayersByTeam(teamId) {
 export default {
   getTeams,
   getSeasonLeaders,
-  getPlayerById,
-  getTeamById,
+  getPlayerProfile,
+  getTeamProfile,
   getPlayersByTeam,
 };

@@ -16,6 +16,28 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+// Determines how to label a player's position (handles two-way players)
+const getPlayerPositionLabel = (player, stats) => {
+  const pos = player?.player?.position;
+
+  // Detect two-way using stats
+  const isTwoWay = stats.avg !== "—" && stats.era !== "—";
+
+  if (isTwoWay) return "Two-Way Player";
+
+  // Otherwise map the stored position
+  const map = {
+    P: "Pitcher",
+    C: "Catcher",
+    IF: "Infielder",
+    OF: "Outfielder",
+    DH: "Designated Hitter",
+  };
+
+  return map[pos] || pos || "—";
+};
+
+
 export default function PlayerComparison() {
   const [teams, setTeams] = useState([]);
 
@@ -305,10 +327,16 @@ export default function PlayerComparison() {
 
               {/* TEXT */}
               <p><strong>Name:</strong> {player.player.full_name}</p>
+
+              <p className="player-position">
+
+              <strong>Position:</strong> {getPlayerPositionLabel(player, stats)}
+              </p>
               <p><strong>AVG:</strong> {stats.avg}</p>
               <p><strong>HR:</strong> {stats.hr}</p>
               <p><strong>ERA:</strong> {stats.era}</p>
               <p><strong>K/9:</strong> {stats.k9}</p>
+
             </>
           ) : (
             <p>No player selected.</p>

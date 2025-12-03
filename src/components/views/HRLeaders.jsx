@@ -60,13 +60,6 @@ export default function HRLeaders({ season = "2025", getSeasonLeaders }) {
         <div>
           {top.length === 0 && <p>No data available.</p>}
           {top.length > 0 && <Bar data={data} options={options} />}
-          {/* <ul>
-            {top.map((p, idx) => (
-              <li key={p.id ?? idx}>
-                {labels[idx]} — {values[idx]}
-              </li>
-            ))}
-          </ul> */}
         </div>
       )}
     </section>

@@ -12,17 +12,15 @@ import AVGLeaders from "./views/AVGLeaders";
 import ERALeaders from "./views/ERALeaders";
 import PlayerBio from "./views/PlayerBio";
 import PlayerPerformance from "./views/PlayerPerformance";
-import PlayerStats from "./views/PlayerStats";
 import TeamBio from "./views/TeamBio";
 import TeamPlayers from "./views/TeamPlayers";
-import TeamPerformance from "./views/TeamPerformance";
 
 export default function Home() {
   const [season, setSeason] = useState("2025");
   const [playerId, setPlayerId] = useState(null);
   const [teamId, setTeamId] = useState(null);
-
   const [teams, setTeams] = useState([]);
+  const [playerNameMap, setPlayerNameMap] = useState({});
 
   useEffect(() => {
     let mounted = true;
@@ -34,6 +32,16 @@ export default function Home() {
       .catch((err) => {
         console.error(err);
         setTeams([]);
+      });
+    fetch("/playerNameToId.json")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m) => {
+        if (!mounted) return;
+        setPlayerNameMap(m ?? {});
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setPlayerNameMap({});
       });
     return () => {
       mounted = false;
@@ -54,10 +62,17 @@ export default function Home() {
         teams={teams}
         season={season}
         playerId={playerId}
+        playerNameMap={playerNameMap}
         teamId={teamId}
         onSeasonChange={setSeason}
-        onPlayerChange={(id) => { setPlayerId(id || null); setTeamId(null); }}
-        onTeamChange={(id) => { setTeamId(id || null); setPlayerId(null); }}
+        onPlayerChange={(id) => {
+          setPlayerId(id || null);
+          setTeamId(null);
+        }}
+        onTeamChange={(id) => {
+          setTeamId(id || null);
+          setPlayerId(null);
+        }}
       />
 
       <div className="views">
@@ -80,11 +95,6 @@ export default function Home() {
               playerId={playerId}
               getPlayerProfile={getPlayerProfile}
             />
-            <PlayerStats
-              playerId={playerId}
-              getPlayerProfile={getPlayerProfile}
-              season={season}
-            />
           </>
         )}
 
@@ -92,11 +102,6 @@ export default function Home() {
           <>
             <TeamBio teamId={teamId} getTeamProfile={getTeamProfile} />
             <TeamPlayers teamId={teamId} getPlayersByTeam={getPlayersByTeam} />
-            <TeamPerformance
-              teamId={teamId}
-              getTeamProfile={getTeamProfile}
-              season={season}
-            />
           </>
         )}
       </div>

@@ -12,7 +12,8 @@ const API_KEY = import.meta.env.VITE_SPORTSRADAR_API_KEY;
 // `/sportradar/*` to `https://api.sportradar.com/*` (see `vite.config.js`).
 const BASE = import.meta.env.VITE_SPORTSRADAR_BASE || "/sportradar";
 const TEAMS_URL = `${BASE}/mlb/trial/v8/en/league/teams.json`;
-
+const CURRENT_SEASON_YEAR = new Date().getFullYear(); // Needed for standings
+const STANDINGS_URL = `${BASE}/mlb/trial/v8/en/seasons/${CURRENT_SEASON_YEAR}/REG/standings.json`;
 /**
  * Fetch basic team data from Sportradar
  * - Sends `accept: application/json` header
@@ -176,8 +177,25 @@ export async function getPlayersByTeam(teamId) {
   }
 }
 
+export async function getStandings() {
+  try {
+    if (!API_KEY) {
+      console.warn("sportsradarClient: No API key set.");
+    }
+    const res = await axios.get(STANDINGS_URL, {
+      params: { api_key: API_KEY },
+      headers: { accept: "application/json" },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("sportsradarClient.getStandings error:", error);
+    throw error;
+  }
+}
+
 export default {
   getTeams,
+  getStandings,
   getSeasonLeaders,
   getPlayerProfile,
   getTeamProfile,

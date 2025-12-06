@@ -31,6 +31,22 @@ export default function GameCard({ date }) {
     return () => (mounted = false);
   }, [date, getGamesForADate]);
 
+  function formatDisplayDate(input) {
+    if (!input) return "";
+    // accept YYYY/MM/DD or YYYY-MM-DD
+    const parts = String(input)
+      .split(/[-\/]/)
+      .map((p) => Number(p));
+    if (parts.length < 3 || parts.some((n) => Number.isNaN(n))) return input;
+    const [y, m, d] = parts;
+    const dt = new Date(y, m - 1, d);
+    return dt.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
   return (
     <div className="game-card">
       <style>{`@keyframes pulse {0%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:0.35}100%{transform:scale(1);opacity:1}} .live-dot{position:absolute;bottom:12px;right:12px;width:10px;height:10px;border-radius:50%;background:red;box-shadow:0 0 8px rgba(255,0,0,0.7);animation:pulse 1s infinite;} .closed-dot{position:absolute;bottom:12px;right:12px;width:10px;height:10px;border-radius:50%;background:#444;box-shadow:none;opacity:0.9;}`}</style>
@@ -39,9 +55,12 @@ export default function GameCard({ date }) {
       {!loading && !error && (
         <div>
           {!games && <p>No game selected or no data available.</p>}
-          {games && date && (
+          {Array.isArray(games) && games.length === 0 && date && (
+            <p>There are no games for the selected date.</p>
+          )}
+          {Array.isArray(games) && games.length > 0 && date && (
             <>
-              <h3>Games on {date}:</h3>
+              <h3>Games on {formatDisplayDate(date)}:</h3>
               <ul
                 style={{
                   listStyleType: "none",
@@ -52,8 +71,7 @@ export default function GameCard({ date }) {
                 }}
               >
                 {games.map((game) => {
-                  const status =
-                    (game.game && game.game.status) || "";
+                  const status = (game.game && game.game.status) || "";
                   const low = String(status).toLowerCase();
                   const isLive = low === "live";
                   const isClosed = low === "closed";

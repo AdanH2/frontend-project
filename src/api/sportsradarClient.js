@@ -1,5 +1,5 @@
 import axios from "axios";
-import gamesv2 from "./gamesv2.json";
+// import gamesv2 from "./gamesv2.json";
 
 // Use Vite env var for the API key. Create a `.env` or `.env.local` with
 // `VITE_SPORTSRADAR_API_KEY=your_key` and do NOT commit that file.
@@ -174,22 +174,22 @@ export async function getPlayersByTeam(teamId) {
 }
 
 export async function getGamesForADate(dateStr) {
-  // try {
-  //   if (!dateStr) return [];
-  //   const url = `${BASE}/mlb/trial/v8/en/games/${dateStr}/boxscore.json`;
-  //   const res = await axios.get(url, {
-  //     params: { api_key: API_KEY },
-  //     headers: { accept: "application/json" },
-  //   });
-  //   console.log("getGamesForADate response:", res.data);
-  //   return res.data || [];
-  // } catch (error) {
-  //   console.error("sportsradarClient.getGamesForADate error:", error);
-  //   throw error;
-  // }
-  // Using local data for development/testing
-  
-  return gamesv2;
+  try {
+    // if(dateStr === "2024/08/28"){
+    //   return gamesv2;
+    // }
+    if (!dateStr) return [];
+    const url = `${BASE}/mlb/trial/v8/en/games/${dateStr}/boxscore.json`;
+    const res = await axios.get(url, {
+      params: { api_key: API_KEY },
+      headers: { accept: "application/json" },
+    });
+    console.log("getGamesForADate response:", res.data);
+    return res.data || [];
+  } catch (error) {
+    console.error("sportsradarClient.getGamesForADate error:", error);
+    throw error;
+  }
 }
 
 export default {

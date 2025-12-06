@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { getGamesForADate } from "../../api/sportsradarClient";
+import GameModal from "./GameModal";
 
 export default function GameCard({ date }) {
   const [games, setGames] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -79,6 +81,7 @@ export default function GameCard({ date }) {
                     <li
                       key={game.game.id}
                       style={{
+                        cursor: "pointer",
                         position: "relative",
                         background: "#041e42ac",
                         color: "white",
@@ -90,6 +93,7 @@ export default function GameCard({ date }) {
                         justifyContent: "space-between",
                         alignItems: "center",
                       }}
+                      onClick={() => setSelectedGame(game)}
                     >
                       <div
                         style={{
@@ -129,6 +133,12 @@ export default function GameCard({ date }) {
                 })}
               </ul>
             </>
+          )}
+          {selectedGame && (
+            <GameModal
+              game={selectedGame}
+              onClose={() => setSelectedGame(null)}
+            />
           )}
         </div>
       )}

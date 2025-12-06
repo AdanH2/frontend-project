@@ -187,6 +187,9 @@ export async function getStandings() {
     return res.data;
   } catch (error) {
     console.error("sportsradarClient.getStandings error:", error);
+  }
+}
+  
 export async function getGamesForADate(dateStr) {
   try {
     if (!dateStr) return [];

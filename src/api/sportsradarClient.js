@@ -1,8 +1,4 @@
 import axios from "axios";
-// getTeamProfile
-// getTeamById
-// getPlayerById
-// getPlayerProfile
 
 // Use Vite env var for the API key. Create a `.env` or `.env.local` with
 // `VITE_SPORTSRADAR_API_KEY=your_key` and do NOT commit that file.
@@ -14,6 +10,8 @@ const BASE = import.meta.env.VITE_SPORTSRADAR_BASE || "/sportradar";
 const TEAM_LIST_URL = `${BASE}/mlb/trial/v8/en/league/teams.json`;
 const CURRENT_SEASON_YEAR = new Date().getFullYear(); // Needed for standings
 const STANDINGS_URL = `${BASE}/mlb/trial/v8/en/seasons/${CURRENT_SEASON_YEAR}/REG/standings.json`;
+const TEAMS_URL = `${BASE}/mlb/trial/v8/en/league/depth_charts.json`;
+
 /**
  * Fetch basic team data from Sportradar
  * - Sends `accept: application/json` header
@@ -189,6 +187,17 @@ export async function getStandings() {
     return res.data;
   } catch (error) {
     console.error("sportsradarClient.getStandings error:", error);
+export async function getGamesForADate(dateStr) {
+  try {
+    if (!dateStr) return [];
+    const url = `${BASE}/mlb/trial/v8/en/games/${dateStr}/schedule.json`;
+    const res = await axios.get(url, {
+      params: { api_key: API_KEY },
+      headers: { accept: "application/json" },
+    });
+    return res.data || [];
+  } catch (error) {
+    console.error("sportsradarClient.getGamesForADate error:", error);
     throw error;
   }
 }
@@ -200,4 +209,5 @@ export default {
   getPlayerProfile,
   getTeamProfile,
   getPlayersByTeam,
+  getGamesForADate,
 };

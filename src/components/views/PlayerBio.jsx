@@ -16,7 +16,7 @@ export default function PlayerBio({ playerId, getPlayerProfile, season }) {
     getPlayerProfile(playerId)
       .then((data) => {
         if (!mounted) return;
-        setPlayer(data?.player ?? data ?? null);
+        setPlayer(data?.player ?? null);
       })
       .catch((err) => {
         if (!mounted) return;
@@ -32,7 +32,7 @@ export default function PlayerBio({ playerId, getPlayerProfile, season }) {
 
   return (
     <section className="view player-bio">
-      <h3>Player Profile {playerId ? `— ${season}` : ""}</h3>
+      <h3>Player Profile</h3>
       {loading && <p>Loading player...</p>}
       {error && <p>Error loading player data.</p>}
       {!loading && !error && (
@@ -46,7 +46,7 @@ export default function PlayerBio({ playerId, getPlayerProfile, season }) {
               <p>Position: {player.primary_position}</p>
               <p>Birthdate: {player.birthdate}</p>
               <p>
-                Height/Weight: {player.height} / {player.weight}
+                Height/Weight: {Math.floor(player.height / 12)}'{player.height % 12}" / {player.weight} lbs
               </p>
             </div>
           )}

@@ -38,7 +38,15 @@ export default function TeamPlayers({ teamId, getPlayersByTeam }) {
       {!loading && !error && (
         <div>
           {players.length === 0 && <p>No players available.</p>}
-          <ul>
+          <ul
+            style={{
+              listStyleType: "none",
+              padding: 0,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+              gap: "40px",
+            }}
+          >
             {players.map((p, idx) => (
               <li key={p.id ?? idx}>
                 {p.full_name} - {p.primary_position}

@@ -11,7 +11,7 @@ const API_KEY = import.meta.env.VITE_SPORTSRADAR_API_KEY;
 // Use a proxied base path during development. The Vite dev server proxies
 // `/sportradar/*` to `https://api.sportradar.com/*` (see `vite.config.js`).
 const BASE = import.meta.env.VITE_SPORTSRADAR_BASE || "/sportradar";
-const TEAMS_URL = `${BASE}/mlb/trial/v8/en/league/teams.json`;
+const TEAM_LIST_URL = `${BASE}/mlb/trial/v8/en/league/teams.json`;
 const CURRENT_SEASON_YEAR = new Date().getFullYear(); // Needed for standings
 const STANDINGS_URL = `${BASE}/mlb/trial/v8/en/seasons/${CURRENT_SEASON_YEAR}/REG/standings.json`;
 /**

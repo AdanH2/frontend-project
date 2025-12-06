@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getGamesForADate } from "../../api/sportsradarClient";
-import GameModal from "./GameModal";
+import GameModal from "./gameModal";
 
 export default function GameCard({ date }) {
   const [games, setGames] = useState(null);

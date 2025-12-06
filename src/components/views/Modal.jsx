@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export default function GameModal({ game, onClose }) {
+export default function Modal({ game, onClose }) {
   useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") onClose && onClose();

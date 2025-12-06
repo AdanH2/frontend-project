@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getGamesForADate } from "../../api/sportsradarClient";
-import GameModal from "./gameModal";
+import Modal from "./Modal";
 
 export default function GameCard({ date }) {
   const [games, setGames] = useState(null);
@@ -135,7 +135,7 @@ export default function GameCard({ date }) {
             </>
           )}
           {selectedGame && (
-            <GameModal
+            <Modal
               game={selectedGame}
               onClose={() => setSelectedGame(null)}
             />

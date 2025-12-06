@@ -8,6 +8,9 @@ const API_KEY = import.meta.env.VITE_SPORTSRADAR_API_KEY;
 // Use a proxied base path during development. The Vite dev server proxies
 // `/sportradar/*` to `https://api.sportradar.com/*` (see `vite.config.js`).
 const BASE = import.meta.env.VITE_SPORTSRADAR_BASE || "/sportradar";
+const TEAM_LIST_URL = `${BASE}/mlb/trial/v8/en/league/teams.json`;
+const CURRENT_SEASON_YEAR = new Date().getFullYear(); // Needed for standings
+const STANDINGS_URL = `${BASE}/mlb/trial/v8/en/seasons/${CURRENT_SEASON_YEAR}/REG/standings.json`;
 const TEAMS_URL = `${BASE}/mlb/trial/v8/en/league/depth_charts.json`;
 
 /**
@@ -173,6 +176,20 @@ export async function getPlayersByTeam(teamId) {
   }
 }
 
+export async function getStandings() {
+  try {
+    if (!API_KEY) {
+      console.warn("sportsradarClient: No API key set.");
+    }
+    const res = await axios.get(STANDINGS_URL, {
+      params: { api_key: API_KEY },
+      headers: { accept: "application/json" },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("sportsradarClient.getStandings error:", error);
+  }
+}
 export async function getGamesForADate(dateStr) {
   try {
     // if(dateStr === "2024/08/28"){
@@ -194,6 +211,7 @@ export async function getGamesForADate(dateStr) {
 
 export default {
   getTeams,
+  getStandings,
   getSeasonLeaders,
   getPlayerProfile,
   getTeamProfile,

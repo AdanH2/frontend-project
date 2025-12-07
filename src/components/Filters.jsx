@@ -58,7 +58,7 @@ export default function Filters({
   }
 
   return (
-    <div className="filters" style={{ marginBottom: 16 }}>
+    <div className="flex flex-col md:flex-row gap-6 mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100 justify-center">
       <label style={{ marginRight: 8 }}>
         Season:
         <select
@@ -66,6 +66,7 @@ export default function Filters({
           onChange={(e) => onSeasonChange(e.target.value)}
           style={{ marginLeft: 8 }}
           disabled={!!playerId || !!teamId}
+          className="border border-solid rounded-md p-1"
         >
           {Array.from({ length: 12 }, (_, i) => 2025 - i).map((yr) => (
             <option key={yr} value={String(yr)}>
@@ -85,6 +86,7 @@ export default function Filters({
           onKeyDown={onNameKey}
           style={{ marginLeft: 8 }}
           disabled={!!teamId}
+          className="border border-solid rounded-md p-1"
         />
         {suggestions.length > 0 && (
           <ul
@@ -125,6 +127,7 @@ export default function Filters({
           onChange={(e) => onTeamChange(e.target.value || null)}
           style={{ marginLeft: 8 }}
           disabled={!!playerId}
+          className="border border-solid rounded-md p-1"
         >
           <option value="">-- none --</option>
           {teams.map((t) => (

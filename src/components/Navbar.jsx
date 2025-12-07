@@ -27,7 +27,7 @@ export default function Navbar() {
             {/* Top-left title */}
             {/* Replaced inline styles with text-black, font-extrabold, text-2xl, and mb-3 (12px) */}
             <h2 className="font-extrabold mb-3 text-gray-900 text-2xl text-left">
-                MLB Stats Dashboard
+                DiamondIQ
             </h2>
 
             {/* Horizontal links + MLB logo container */}

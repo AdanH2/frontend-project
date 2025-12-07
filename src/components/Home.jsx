@@ -52,9 +52,10 @@ export default function Home() {
   const isTeamMode = !!teamId;
 
   return (
-    <div className="page home-page">
-      <h2>Welcome to the MLB Stats Dashboard</h2>
-      <p>
+    <div className="bg-gray-50 min-h-screen p-4 md:p-10 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-6">Welcome to the DiamondIQ</h1>
+      <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Your Ultimate MLB Stats Hub</h2>
+      <p className="mb-4">
         Explore leaders, players, and team performance for the selected season.
       </p>
 

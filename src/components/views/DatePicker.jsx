@@ -26,7 +26,7 @@ export default function DatePicker({ value, onChange }) {
   }
 
   return (
-    <div style={{ marginBottom: 12 }}>
+    <div className="flex flex-col md:flex-row gap-6 mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100 justify-center">
       <label>
         Date:
         <input
@@ -34,6 +34,7 @@ export default function DatePicker({ value, onChange }) {
           value={isoValue}
           onChange={handleChange}
           style={{ marginLeft: 8 }}
+          className="border border-solid rounded-md p-1"
         />
       </label>
     </div>

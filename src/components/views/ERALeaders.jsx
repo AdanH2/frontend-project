@@ -52,7 +52,7 @@ export default function ERALeaders({ season = "2025", getSeasonLeaders }) {
   };
 
   return (
-    <section className="view era-leaders">
+    <section className="md:flex-row gap-6 mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
       <h3>ERA Leaders — {season}</h3>
       {loading && <p>Loading...</p>}
       {error && <p>Error loading ERA leaders.</p>}

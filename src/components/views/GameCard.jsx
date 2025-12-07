@@ -62,15 +62,9 @@ export default function GameCard({ date }) {
           )}
           {Array.isArray(games) && games.length > 0 && date && (
             <>
-              <h3>Games on {formatDisplayDate(date)}:</h3>
+              <h3 className="mb-6 text-xl font-semibold text-gray-700 mb-4">Games on {formatDisplayDate(date)}:</h3>
               <ul
-                style={{
-                  listStyleType: "none",
-                  padding: 0,
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                  gap: "50px",
-                }}
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 bg-white p-6 rounded-xl shadow-lg border border-gray-100"
               >
                 {games.map((game) => {
                   const status = (game.game && game.game.status) || "";

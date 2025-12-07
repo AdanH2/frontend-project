@@ -13,8 +13,8 @@ export default function Live() {
   const [date, setDate] = useState(defaultDate);
 
   return (
-    <div className="page live-page">
-      <h2>Live Stats</h2>
+    <div className="bg-gray-50 min-h-screen p-4 md:p-10 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-2">Live Updates</h1>
       <DatePicker value={date} onChange={setDate} />
       {/* <GameCard date={"2024/08/28"} /> */}
       <GameCard date={date} />

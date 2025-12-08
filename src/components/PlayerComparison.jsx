@@ -278,13 +278,6 @@ export default function PlayerComparison() {
     ({ player, loading, title }, i) => {
       const stats = getPlayerStats(player);
 
-      // Extract best available player photo
-      const photo =
-        player?.player?.official_image ||
-        player?.player?.photo ||
-        player?.player?.images?.headshot?.href ||
-        null;
-
       return (
         <div
           key={i}
@@ -298,23 +291,7 @@ export default function PlayerComparison() {
             <p className="text-gray-500 italic">Loading...</p>
           ) : player ? (
             <>
-              {/* PLAYER IMAGE */}
-              <div
-                // Tailwind utility classes
-                className="absolute top-6 right-6 w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center shadow-md"
-              >
-                {photo ? (
-                  <img
-                    src={photo}
-                    alt={`${player.player.full_name} headshot`}
-                    // Converted style to object-cover. Using a placeholder as fallback.
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/CCCCCC/333333?text=No+Photo"; }}
-                  />
-                ) : (
-                  <span className="text-xs text-gray-500">No Image</span>
-                )}
-              </div>
+             
 
               {/* TEXT STATS */}
               <div className="space-y-1">
